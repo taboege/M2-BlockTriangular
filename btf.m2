@@ -209,7 +209,7 @@ fineDecomposition = (A,R,C,M) -> (
   -- To make the matrix block-triangular, we compute the topological
   -- sorting of a directed graph based on Lemma 2.6 in the paper.
   V = toList(0..#Cs-1);
-  E = select(V**V, (j,i) -> i != j and not all((Cs#j)**(Rs#i), (r,c) -> A_(r,c) == 0));
+  E = select(V**V, (j,i) -> i != j and not all((Rs#i)**(Cs#j), (r,c) -> A_(r,c) == 0));
   G := digraph(V, E);
   T := topologicalSort(G, "degree");
   Rs = apply(T, i -> Rs#(T#i));
