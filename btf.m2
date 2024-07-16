@@ -193,7 +193,7 @@ stronglyConnectedComponents = G -> (
 -- Compute the fine decomposition of the square submatrix of A with
 -- rows R and columns C on which M is a perfect matching. Returns a
 -- reordering of R and C so that elements of the same block are
--- adjacent.
+-- adjacent and non-zeros are only in the upper triangle.
 fineDecomposition = (A,R,C,M) -> (
   -- Compute the graph G_d by oriented non-matching edges from columns to
   -- rows and contracting matching edges, then identifying all vertices
