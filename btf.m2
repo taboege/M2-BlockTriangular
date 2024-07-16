@@ -83,9 +83,11 @@ augmentingPath = (A, R, C, M, c, mrows) -> (
     E := select(M, e -> e#0 == r);
     if #E == 0 then return {c,r}
     else (
-      d := e#1;
-      q := augmentingPath(A, R, C, M, d, mrows|{r});
-      if q != null then return {c,r} | q;
+      for e in E do (
+        d := e#1;
+        q := augmentingPath(A, R, C, M, d, mrows|{r});
+        if q != null then return {c,r} | q;
+      );
     );
   );
   null
@@ -105,10 +107,12 @@ alternatingRC = (A,R,C,M,c,mrows) -> (
       AR = append(AR, r);
     )
     else (
-      d := e#1;
-      (ar, ac) := alternatingRC(A, R, C, M, d, mrows|{r});
-      AR = AR|{r}|ar;
-      AC = AC|ac;
+      for e in E do (
+        d := e#1;
+        (ar, ac) := alternatingRC(A, R, C, M, d, mrows|{r});
+        AR = AR|{r}|ar;
+        AC = AC|ac;
+      );
     );
   );
   (sort(toList(set(AR))), sort(toList(set(AC))))
@@ -154,8 +158,8 @@ coarseDecomposition = (A,R,C,M) -> (
     -- alternatingRC is written from the perspective of an unmatched column.
     -- To apply it to unmatched rows, we transpose all the data and results.
     (vc, vr) := alternatingRC(transpose(A),C,R,M/reverse,r,{});
-    VR = VR|Vr;
-    VC = VC|Vc;
+    VR = VR|vr;
+    VC = VC|vc;
   );
   VR = sort(toList(set(VR)));
   VC = sort(toList(set(VC)));
@@ -173,7 +177,7 @@ diagonalDecomposition = (A,R,C) -> (
     apply(R, r -> "r"|toString(r) => r) |
     apply(C, c -> "c"|toString(c) => c)
   );
-  E := delete(null, apply(R**C, (r,c) -> if B_(r,c) != 0 then {"r"|toString(r), "c"|toString(c)}));
+  E := delete(null, apply(R**C, (r,c) -> if A_(r,c) != 0 then {"r"|toString(r), "c"|toString(c)}));
   G := graph(V, E);
   comps := connectedComponents G;
   R = flatten apply(comps, D -> delete(null, apply(D, d -> if d_0 == "r" then lut#d)));
@@ -199,7 +203,6 @@ fineDecomposition = (A,R,C,M) -> (
   -- rows and contracting matching edges, then identifying all vertices
   -- with the rows.
   m := new HashTable from apply(M, (r,c) -> r => c);
-  n := new HashTable from apply(M, (r,c) -> c => r);
   V := R;
   E := select(V**V, (r1,r2) -> A_(r2,m#r1) != 0 and not member((r2,m#r1), M));
   Gd := digraph(V,E);
